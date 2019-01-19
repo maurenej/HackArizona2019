@@ -14,7 +14,7 @@ def kalmanFilterPositionChange(initial_state_mean, initial_state_covariance, ini
   AccX_Variance = 0.0007
 
   # time step
-  dt = 0.01
+  dt = 1
 
   # transition_matrix  
   F = [[1, dt, 0.5*dt**2], 
