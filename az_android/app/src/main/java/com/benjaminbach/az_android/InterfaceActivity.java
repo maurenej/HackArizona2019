@@ -71,14 +71,30 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
     }
 
     public void beginTransfer(View v) {
-        new DataSender().execute(Double.toString(send1[0]) + " " + Double.toString(send1[1]) + " " + Double.toString(send1[2]));
-        new DataSender().execute(Double.toString(send2[0]) + " " + Double.toString(send2[1]) + " " + Double.toString(send2[2]));
+
+        final Handler handler = new Handler();
+        final int delay = 100; //1 second=1000 milisecond, 15*1000=15seconds
+        Runnable runnable;
+        handler.postDelayed(new Runnable(){
+            @Override
+            public void run(){
+                for(int i = 0; i < 3; i++) {
+                    if(send1[i] <= 0.0001 && send1[i] >= -0.0001)
+                        send1[i] = 0;
+                    if(send2[i] <= 0.0001 && send2[i] >= -0.0001)
+                        send2[i] = 0;
+                }
+                new DataSender().execute(Double.toString(send1[0]) + " " + Double.toString(send1[1]) + " " + Double.toString(send1[2])
+                        + " " + Double.toString(send2[0]) + " " + Double.toString(send2[1]) + " " + Double.toString(send2[2]));
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+
     }
 
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-
 
     private float [] acc = new float[3];
     private float [] magnet = new float[3];
