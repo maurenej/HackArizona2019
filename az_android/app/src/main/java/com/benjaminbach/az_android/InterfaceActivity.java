@@ -1,5 +1,6 @@
 package com.benjaminbach.az_android;
 
+import android.os.*;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -7,13 +8,42 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class InterfaceActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor accelerometer1, accelerometer2, magnetic_field;
+
+    private boolean SEND_DATA = false;
 
     TextView x, y, z;
     TextView a, b, c;
@@ -40,8 +70,13 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
         c = findViewById(R.id.roll);
     }
 
+    public void beginTransfer(View v) {
+        new DataSender().execute(Double.toString(send1[0]) + " " + Double.toString(send1[1]) + " " + Double.toString(send1[2]));
+        new DataSender().execute(Double.toString(send2[0]) + " " + Double.toString(send2[1]) + " " + Double.toString(send2[2]));
+    }
 
-    public void onAccuracyChanged(Sensor sensor, int arg1) {
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
 
@@ -49,11 +84,15 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
     private float [] magnet = new float[3];
     private float [] orientation = new float[3];
 
+    private float [] send1 = new float[3];
+    private float [] send2 = new float[3];
+
     public void onSensorChanged(SensorEvent event){
 
         switch (event.sensor.getType()) {
 
             case Sensor.TYPE_LINEAR_ACCELERATION:
+                send1 = event.values.clone();
                 x.setText("x: " + Double.toString(event.values[0]));
                 y.setText("y: " + Double.toString(event.values[1]));
                 z.setText("z: " + Double.toString(event.values[2]));
@@ -76,6 +115,7 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
             if (SensorManager.getRotationMatrix(R, I, acc, magnet)) {
                 //orientation[] = new float[3];
                 SensorManager.getOrientation(R, orientation);
+                send2 = orientation.clone();
                 a.setText("x: " + Double.toString(orientation[0]));
                 b.setText("y: " + Double.toString(orientation[1]));
                 c.setText("z: " + Double.toString(orientation[2]));
@@ -84,8 +124,6 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
             acc = null;
             magnet = null;
         }
-
-
     }
 
 
