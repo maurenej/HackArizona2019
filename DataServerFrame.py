@@ -66,7 +66,7 @@ while 1:
     DataSet = [float(i) for i in DataSet]
 
     initial_state_mean, initial_state_covariance, initial_AccX_Value, PositionChange = KalmanFilter.kalmanFilterPositionChange(initial_state_mean, initial_state_covariance, initial_AccX_Value, math.sqrt((DataSet[0]**2) + (DataSet[2]**2)))
-    yAngle = DataSet[4]
+    yAngle = -DataSet[4]
     xAngle = DataSet[3]
     dx = (PositionChange * math.cos(yAngle)) * math.cos(xAngle)
     x += dx
