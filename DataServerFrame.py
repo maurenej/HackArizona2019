@@ -3,6 +3,17 @@ import sys
 import KalmanFilter 
 import math
  
+# For data visualization
+import numpy as np
+
+from bokeh.io import output_notebook
+#from bokeh.plotting import figure, curdoc, show, push_notebook
+from bokeh.layouts import row
+import matplotlib.pyplot as plt
+
+# C:\Python37-32\python C:\Users\ericj\Documents\HackArizona\HackArizona2019\DataServerFrame.py
+# C:\Python37-32\Scripts\jupyter notebook
+
 HOST = '192.168.0.151' #this is your localhost
 PORT = 8000
  
@@ -39,7 +50,11 @@ print ('Socket Bind Success!')
 s.listen(10)
 print ('Socket is now listening')
  
- 
+output_notebook
+plt.axis([-1, 1, -1, 1])
+# create a new plot with the tools above, and explicit ranges
+#show(p)
+colors = ["#111111"]
 while 1:
     conn, addr = s.accept()
     #print ('Connect with ' + addr[0] + ':' + str(addr[1]))
@@ -60,4 +75,16 @@ while 1:
     dz = PositionChange * math.sin(yAngle)
     z += dz
     print(str(x) + ' ' + str(y) + ' ' + str(z))
+
+    # add a circle renderer with vectorized colors and sizes
+    #p.circle(x, y, radius=1.5, fill_color=colors, fill_alpha=0.6, line_color=None)
+    # show the results
+    i, d = math.modf(z)
+    color = int(d) + 10
+    plt.scatter(x, y, c = "#" + "{:06x}".format(color))
+    plt.pause(0.05)
+mng = plt.get_current_fig_manager()
+mng.frame.Maximize(True)
+plt.show()
+#session.loop_until_closed()
 s.close()
