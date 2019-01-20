@@ -1,5 +1,8 @@
 import KalmanFilter 
 import math
+import numpy as np
+from bokeh.plotting import figure, output_file, show
+
 # Data description
 #  Time
 #  AccX_HP - high precision acceleration signal
@@ -13,6 +16,14 @@ initial_state_mean = [0, 0, 0]
 initial_state_covariance = [[0, 0, 0], [0, 0, 0], [0, 0, 0.0007]]
 initial_AccX_Value = [0, 0]
 new_AccX_Value = [0, 0]
+
+# output to static HTML file (with CDN resources)
+output_file("color_scatter.html", title="color_scatter.py example", mode="cdn")
+
+TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
+
+# create a new plot with the tools above, and explicit ranges
+p = figure(tools=TOOLS, x_range=(0, 100), y_range=(0, 100))
 
 PositionChange = 0
 x = 0
@@ -36,3 +47,12 @@ for i in range(len(dummyData)):
 	y += dy
 	dz = PositionChange * math.sin(yAngle)
 	z += dz
+
+	colors = ["#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)]
+
+	# add a circle renderer with vectorized colors and sizes
+	p.circle(x, y, radius=radii, fill_color=colors, fill_alpha=0.6, line_color=None)
+
+	# show the results
+	show(p)
+
