@@ -43,6 +43,7 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
     private SensorManager mSensorManager;
     private Sensor accelerometer1, accelerometer2, magnetic_field;
 
+    private Handler handler;
     private boolean SEND_DATA = false;
 
     TextView x, y, z;
@@ -68,13 +69,21 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
         a = findViewById(R.id.azimuth);
         b = findViewById(R.id.pitch);
         c = findViewById(R.id.roll);
+
+        handler = new Handler();
     }
 
-    public void beginTransfer(View v) {
 
-        final Handler handler = new Handler();
-        final int delay = 100; //1 second=1000 milisecond, 15*1000=15seconds
-        Runnable runnable;
+
+    public void beginTransfer(View v) {
+        if(SEND_DATA) {
+            new DataSender().execute("3292");
+            handler.removeCallbacksAndMessages(null);
+            SEND_DATA = false;
+            return;
+        }
+
+        final int delay = 1000;
         handler.postDelayed(new Runnable(){
             @Override
             public void run(){
@@ -89,6 +98,7 @@ public class InterfaceActivity extends AppCompatActivity implements SensorEventL
                 handler.postDelayed(this, delay);
             }
         }, delay);
+        SEND_DATA = true;
 
     }
 
